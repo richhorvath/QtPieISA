@@ -1,5 +1,5 @@
 # set variables
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_EXTRA_CXX_FLAGS} -Wall -Wextra -Wpedantic -fmessage-length=0 -m64 -std=c++14-fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_EXTRA_CXX_FLAGS} -Wall -Wextra -Wpedantic -fmessage-length=0 -m64 -std=c++14")
 set(APP_QT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" CACHE STRING "Isa Qt Include Directory")
 
 set(CMAKE_AUTOMOC ON)
@@ -10,10 +10,12 @@ set(CMAKE_AUTOUIC ON)
 # find packages
 find_package(Qt5Core CONFIG REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5Xml REQUIRED)
+find_package(Qt5XmlPatterns REQUIRED)
 
 # get source, headers, resources
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/rfdu/qt/*.hpp")
+file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/isa/*.hpp")
 file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.qrc")
 file(GLOB_RECURSE FORMS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.ui")
 
@@ -24,6 +26,8 @@ add_library(IsaQt STATIC ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
 target_link_libraries(IsaQt
   Qt5::Core
   Qt5::Widgets
+  Qt5::Xml
+  Qt5::XmlPatterns
   )
 
 # includes
