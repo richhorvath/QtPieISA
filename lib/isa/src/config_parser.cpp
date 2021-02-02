@@ -20,14 +20,14 @@ void ConfigParser::parse(const QString &config_location, InstVec *inst_vec) {
   while (!n.isNull()) {
     QDomElement e = n.toElement();  // try to convert the node to an element.
     if (!e.isNull()) {
-      Instruction inst(n);
+      OpCode inst(n);
       inst_vec->push_back(inst);
     }
     n = n.nextSibling();
   }
 }
 
-Instruction::Instruction(const QDomNode &node)
+OpCode::OpCode(const QDomNode &node)
     : m_op_code_(node.attributes().namedItem("Op_Code").nodeValue()) {
   bool ok = true;
   m_hex_code_ = node.attributes()
