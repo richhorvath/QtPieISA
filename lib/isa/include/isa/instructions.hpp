@@ -71,7 +71,7 @@ enum class OpCodesHex : uint8_t {
 
 /**********************************************************************/
 
-enum class OpTypes : uint8_t { R = 0x00, IL, I, J };
+enum class OpTypes : uint8_t { R = 0x00, II, I, J };
 
 /**********************************************************************/
 
@@ -121,7 +121,7 @@ struct multiply {
  *@brief
  * Template function to help launch rtype instructions.
  */
-template <typename Op, typename T>
+template <typename Op>
 void rTypeInstruction(Register* source1, Op opFunc, Register* source2,
                       Register* dest) {
   auto result = opFunc(source1->readData(), source2->readData());
@@ -177,11 +177,14 @@ class Instruction {
   void setOpType(OpTypes type);
   void setData(uint8_t data);
   void setDataType(uint8_t dataType);
+  void setOpCode(uint8_t opcode);
 
-  uint8_t data();
-  Register* source1();
-  Register* source2();
-  Register* destination();
+  uint8_t data() const;
+  Register* source1() const;
+  Register* source2() const;
+  Register* destination() const;
+  OpTypes optype() const { return m_type_; }
+  uint8_t opcode() const { return m_opcode_; }
 
  private:
   Register* m_source1_;
@@ -193,6 +196,7 @@ class Instruction {
   uint8_t m_data_type_;
 };
 
+using DecodedInstructions = QVector<isa::Instruction>;
 /**********************************************************************/
 
 }  // namespace isa

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+#include "instructions.hpp"
 #include "isa/config_parser.hpp"
 #include "isa/decoder.hpp"
 
