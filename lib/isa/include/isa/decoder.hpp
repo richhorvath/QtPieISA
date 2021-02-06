@@ -1,4 +1,4 @@
-#ifndef LIB_ISA_COMMAND_PARSER_HPP_
+﻿#ifndef LIB_ISA_COMMAND_PARSER_HPP_
 #define LIB_ISA_COMMAND_PARSER_HPP_
 
 #include <QDebug>
@@ -26,14 +26,6 @@ class InstructionDecoder {
    */
   isa::DecodedInstructions decode(const QString &program_string);
 
-  /**
-   * @brief setRegisters
-   * @param registers
-   */
-  void setRegisters(QVector<Register *> *registers) {
-    m_registers_ = registers;
-  }
-
  private:
   /**
    * @brief buildRInstruction
@@ -55,15 +47,20 @@ class InstructionDecoder {
   const isa::Instruction buildIInstructionImmediate(const QStringList &i_inst);
 
   /**
+   * @brief buildJInstruction
+   * @param j_inst
+   * @return
+   */
+  const isa::Instruction buildJInstruction(const QStringList &j_inst);
+  /**
    * @brief getInstrRegister
    * @param reg_str
    * @return
    */
-  Register *getInstrRegister(const QString &reg_str);
+  uint8_t getInstrRegister(const QString &reg_str);
 
   QMap<QString, uint8_t> m_opStrToHex_;
   QMap<uint8_t, QString> m_opHextoStr_;
   QMap<QString, bool> m_registerTokens_;
-  QVector<Register *> *m_registers_;
 };
 #endif  // LIB_ISA_COMMAND_PARSER_HPP_

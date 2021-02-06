@@ -34,25 +34,26 @@ isa::DecodedInstructions InstructionDecoder::decode(
     if (instruction.size() > 2) {
       if (m_registerTokens_.contains(instruction[0])) {
         if (m_registerTokens_.contains(instruction[2])) {
-          qDebug() << "r-instruction";
           // build R instruction
           if (m_opStrToHex_.contains(instruction[1])) {
+            qDebug() << "decoding r inst";
             decoded_instructions.push_back(buildRInstruction(instruction));
           } else {
             qDebug() << "syntax error";
           }
         } else if (instruction.size() > 3 &&
                    m_opStrToHex_.contains(instruction[3])) {
+          qDebug() << "decoding i inst";
           decoded_instructions.push_back(buildIInstruction(instruction));
         } else if (re.exactMatch(instruction[2])) {
+          qDebug() << "decoding I immediate inst";
           decoded_instructions.push_back(
               buildIInstructionImmediate(instruction));
         } else {
           qDebug() << "inner syntax error";
         }
       } else if (instruction[0] == "opcode") {
-        qDebug() << "j-instruction";
-        // build j instruction
+        decoded_instructions.push_back(buildJInstruction(instruction));
       } else {
         qDebug() << "syntax error";
       }
@@ -82,7 +83,7 @@ const isa::Instruction InstructionDecoder::buildIInstruction(
   isa::Instruction inst;
   inst.setSource1(getInstrRegister(r_inst[0]));
   bool ok = true;
-  inst.setData(r_inst[2].toUInt(&ok, 16));
+  inst.setData(r_inst[2].toUInt());
   inst.setDestination(getInstrRegister(r_inst[3]));
   inst.setOpCode(m_opStrToHex_.value(r_inst[1]));
   inst.setOpType(isa::OpTypes::I);
@@ -96,31 +97,39 @@ const isa::Instruction InstructionDecoder::buildIInstructionImmediate(
     const QStringList &r_inst) {
   isa::Instruction inst;
   bool ok = true;
-  inst.setData(r_inst[2].toUInt(&ok, 16));
+  inst.setData(r_inst[2].toUInt());
   inst.setDestination(getInstrRegister(r_inst[0]));
   inst.setOpCode(m_opStrToHex_.value(r_inst[1]));
   inst.setOpType(isa::OpTypes::II);
 
   return inst;
 }
+
 /**********************************************************************/
 
-Register *InstructionDecoder::getInstrRegister(const QString &reg_str) {
-  Register *reg = nullptr;
-  qDebug() << "Getting register " << reg_str;
-  if (register0 == reg_str) {
-    reg = m_registers_->value(0);
-  } else if (register1 == reg_str) {
-    reg = m_registers_->value(1);
-  } else if (register2 == reg_str) {
-    reg = m_registers_->value(2);
-  } else if (register3 == reg_str) {
-    reg = m_registers_->value(3);
-  }
-
-  qDebug() << "register data " << reg->readData();
-  if (reg == nullptr) {
-    qDebug() << "YAH FUCKED UP ROCKY";
-  }
-  return reg;
+const isa::Instruction InstructionDecoder::buildJInstruction(
+    const QStringList &j_inst) {
+  isa::Instruction inst;
+  bool ok = true;
+  inst.setData(j_inst[2].toUInt(&ok, 16));
+  inst.setOpCode(m_opStrToHex_.value(j_inst[0]));
+  inst.setOpType(isa::OpTypes::J);
 }
+
+/**********************************************************************/
+
+uint8_t InstructionDecoder::getInstrRegister(const QString &reg_str) {
+  uint8_t reg_index;
+  if (register0 == reg_str) {
+    reg_index = 0x00;
+  } else if (register1 == reg_str) {
+    reg_index = 0x01;
+  } else if (register2 == reg_str) {
+    reg_index = 0x02;
+  } else if (register3 == reg_str) {
+    reg_index = 0x03;
+  }
+  return reg_index;
+}
+
+/**********************************************************************/

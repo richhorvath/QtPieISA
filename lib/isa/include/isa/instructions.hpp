@@ -3,6 +3,8 @@
 
 #include <QMap>
 #include <QString>
+#include <QVector>
+#include <memory>
 
 #include "isa/register.hpp"
 
@@ -10,8 +12,10 @@ namespace isa {
 
 /**********************************************************************/
 
-/**********************************************************************/
-
+/**
+ * @brief The OpCodesHex enum
+ * OpCode Enumerations
+ */
 enum class OpCodesHex : uint8_t {
   SUBTRACT = 0x01,
   MODULUS,
@@ -75,55 +79,14 @@ enum class OpTypes : uint8_t { R = 0x00, II, I, J };
 
 /**********************************************************************/
 
-template <typename T>
-struct subtract {
-  T operator()(T x, T y) { return x - y; }
-};
-
-/**********************************************************************/
-
-template <typename T>
-struct modulus {
-  T operator()(T x, T y) { return x % y; }
-};
-
-/**********************************************************************/
-
-template <typename T>
-struct bitwiseAnd {
-  T operator()(T x, T y) { return x | y; }
-};
-
-/**********************************************************************/
-
-template <typename T>
-struct add {
-  T operator()(T x, T y) { return x + y; }
-};
-
-/**********************************************************************/
-
-template <typename T>
-struct divide {
-  T operator()(T x, T y) { return x / y; }
-};
-
-/**********************************************************************/
-
-template <typename T>
-struct multiply {
-  T operator()(T x, T y) { return x * y; }
-};
-
-/**********************************************************************/
-
 /**
  *@brief
  * Template function to help launch rtype instructions.
  */
 template <typename Op>
-void rTypeInstruction(Register* source1, Op opFunc, Register* source2,
-                      Register* dest) {
+void rTypeInstruction(std::shared_ptr<Register> source1, Op opFunc,
+                      std::shared_ptr<Register> source2,
+                      std::shared_ptr<Register> dest) {
   auto result = opFunc(source1->readData(), source2->readData());
   dest->writeData(result);
 }
@@ -132,20 +95,9 @@ void rTypeInstruction(Register* source1, Op opFunc, Register* source2,
  *@brief
  * Template function to help launch i-instruction
  */
-template <typename Op, typename T>
-void iTypeInstruction(Register* source1, Op opFunc, T immediate,
-                      Register* dest) {
-  auto result = opFunc(source1->readData(), immediate);
-  dest->writeData(result);
-}
-
-/**
- *@brief
- * Template function to help launch i-instruction
- */
-template <typename Op, typename T>
-void iTypeInstruction(Register* dest, Op opFunc, T address_constant) {
-  auto result = opFunc(dest->readData(), address_constant);
+template <typename T>
+void iTypeInstructionImmediate(std::shared_ptr<Register> dest,
+                               T address_constant) {
   dest->writeData(address_constant);
 }
 
@@ -160,36 +112,45 @@ void jTypeInstruction(Op opFunc, T address) {
 
 /**
  * @brief The Instruction class
+ * Instruction class acts as a decoded instruction. The CPU in this case
+ * mainwindow only needs to read the corresponding pointers and data and call
+ * operations from the ALU class.
  */
 class Instruction {
  public:
-  Instruction()
-      : m_source1_(nullptr),
-        m_source2_(nullptr),
-        m_destination_(nullptr),
-        m_opcode_(0x00),
-        m_data_(0x00),
-        m_data_type_(0x00){};
+  /**
+   * @brief Instruction
+   * Main constructor
+   */
+  Instruction() : m_opcode_(0x00), m_data_(0x00), m_data_type_(0x00){};
 
-  void setSource1(Register* source);
-  void setSource2(Register* source);
-  void setDestination(Register* dest);
+  /****SETTERS****/
+  void setSource1(uint8_t source);
+  void setSource2(uint8_t source);
+  void setDestination(uint8_t source);
   void setOpType(OpTypes type);
   void setData(uint8_t data);
+
+  /**
+   * @brief setDataType
+   * @param dataType
+   * For future development, to include ints, floats etc.
+   */
   void setDataType(uint8_t dataType);
   void setOpCode(uint8_t opcode);
 
+  /****GETTERS****/
   uint8_t data() const;
-  Register* source1() const;
-  Register* source2() const;
-  Register* destination() const;
+  uint8_t source1() const;
+  uint8_t source2() const;
+  uint8_t destination() const;
   OpTypes optype() const { return m_type_; }
   uint8_t opcode() const { return m_opcode_; }
 
  private:
-  Register* m_source1_;
-  Register* m_source2_;
-  Register* m_destination_;
+  uint8_t m_source1_;
+  uint8_t m_source2_;
+  uint8_t m_destination_;
   uint8_t m_opcode_;
   OpTypes m_type_;
   uint8_t m_data_;
@@ -197,6 +158,7 @@ class Instruction {
 };
 
 using DecodedInstructions = QVector<isa::Instruction>;
+
 /**********************************************************************/
 
 }  // namespace isa

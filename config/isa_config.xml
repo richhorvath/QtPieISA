@@ -10,7 +10,7 @@
 <instruction Op_Code="(*)" Type="R" Hex_Representation="0x08"></instruction>
 <instruction Op_Code="(/)" Type="I" Hex_Representation="0x09"></instruction>
 <instruction Op_Code="(+)" Type="I" Hex_Representation="0x0A"></instruction>
-<instruction Op_Code="(&lt;-) " Type="I" Hex_Representation="0x0B"></instruction>
+<instruction Op_Code="(&lt;-)" Type="I" Hex_Representation="0x0B"></instruction>
 <instruction Op_Code="*" Type="R" Hex_Representation="0x0C"></instruction>
 <instruction Op_Code="*(-)" Type="R" Hex_Representation="0x0D"></instruction>
 <instruction Op_Code="/" Type="R" Hex_Representation="0x0E"></instruction>
